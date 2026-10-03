@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -22,9 +22,12 @@ const range = (from: number, to: number) =>
     </option>
   ));
 
+const noSubscribe = () => () => {};
+
 export function SearchForm({ initial }: { initial?: Search }) {
   const router = useRouter();
-  const [today] = useState(localToday);
+  // '' on the server and in the prerendered HTML; the browser's local date after hydration.
+  const today = useSyncExternalStore(noSubscribe, localToday, () => '');
   const schema = useMemo(() => searchFormSchema(today), [today]);
   const {
     register,
@@ -51,7 +54,7 @@ export function SearchForm({ initial }: { initial?: Search }) {
 
   // Dates depend on the browser's "today", so fill them after hydration.
   useEffect(() => {
-    if (getValues('depart')) return;
+    if (!today || getValues('depart')) return;
     setValue('depart', addDays(today, 14));
     setValue('return', addDays(today, 21));
   }, [getValues, setValue, today]);
@@ -98,7 +101,7 @@ export function SearchForm({ initial }: { initial?: Search }) {
           {(p) => (
             <input
               type="date"
-              min={today}
+              min={today || undefined}
               className="input"
               {...p}
               {...register('depart')}
@@ -110,7 +113,7 @@ export function SearchForm({ initial }: { initial?: Search }) {
             {(p) => (
               <input
                 type="date"
-                min={today}
+                min={today || undefined}
                 className="input"
                 {...p}
                 {...register('return')}
