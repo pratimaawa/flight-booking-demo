@@ -77,4 +77,21 @@ describe('passengers', () => {
       issues({ type: 'infant', title: 'Miss', dob: '2024-11-02' })
     ).toEqual([]);
   });
+
+  it('reports date rules even while other fields are still empty', () => {
+    expect(
+      issues({
+        givenName: '',
+        title: '',
+        nationality: '',
+        passportNo: '',
+        passportExpiry: '',
+        type: 'infant',
+        dob: '2023-06-01',
+      })
+    ).toContainEqual([
+      'passengers.0.dob',
+      'Infants must be under 2 on the travel date',
+    ]);
+  });
 });

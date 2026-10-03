@@ -42,6 +42,8 @@ export const contactSchema = z.object({
     .regex(/^\+?[0-9][0-9 ]{6,14}$/, 'Enter a valid phone number'),
 });
 
+const isDate = (v: unknown): v is string => isoDate.safeParse(v).success;
+
 export function bookingFormSchema(dates: {
   departDate: string;
   lastDate: string;
@@ -51,29 +53,36 @@ export function bookingFormSchema(dates: {
       passengers: z.array(passengerSchema).min(1),
       contact: contactSchema,
     })
-    .superRefine((v, ctx) =>
-      v.passengers.forEach((p, i) => {
-        const issue = (field: string, message: string) =>
-          ctx.addIssue({
-            code: 'custom',
-            path: ['passengers', i, field],
-            message,
-          });
-        if (p.passportExpiry <= dates.lastDate)
-          issue(
-            'passportExpiry',
-            'Passport must be valid after your last flight'
-          );
-        if (p.dob > dates.departDate)
-          return issue('dob', 'Date of birth must be before travel');
-        const age = ageOn(p.dob, dates.departDate);
-        if (p.type === 'adult' && age < 12)
-          issue('dob', 'Adults must be 12 or older on the travel date');
-        if (p.type === 'child' && (age < 2 || age > 11))
-          issue('dob', 'Children must be 2–11 on the travel date');
-        if (p.type === 'infant' && age >= 2)
-          issue('dob', 'Infants must be under 2 on the travel date');
-      })
+    .superRefine(
+      (v, ctx) =>
+        v.passengers.forEach((p, i) => {
+          const issue = (field: string, message: string) =>
+            ctx.addIssue({
+              code: 'custom',
+              path: ['passengers', i, field],
+              message,
+            });
+          if (isDate(p.passportExpiry) && p.passportExpiry <= dates.lastDate)
+            issue(
+              'passportExpiry',
+              'Passport must be valid after your last flight'
+            );
+          if (!isDate(p.dob)) return;
+          if (p.dob > dates.departDate)
+            return issue('dob', 'Date of birth must be before travel');
+          const age = ageOn(p.dob, dates.departDate);
+          if (p.type === 'adult' && age < 12)
+            issue('dob', 'Adults must be 12 or older on the travel date');
+          if (p.type === 'child' && (age < 2 || age > 11))
+            issue('dob', 'Children must be 2–11 on the travel date');
+          if (p.type === 'infant' && age >= 2)
+            issue('dob', 'Infants must be under 2 on the travel date');
+        }),
+      // Run even while other fields are invalid, so date errors show as the user types.
+      {
+        when: (payload) =>
+          Array.isArray((payload.value as { passengers?: unknown }).passengers),
+      }
     );
 }
 
