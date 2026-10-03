@@ -41,5 +41,5 @@ export function createBookingRef() {
   return Array.from(bytes, (b) => REF_CHARS[b % REF_CHARS.length]).join('');
 }
 
-// ponytail: per-instance memory; a real backend would persist this.
+// Note: per-instance memory; a real backend would persist this.
 export const bookingsByRequest = new Map<string, string>();

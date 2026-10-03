@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       { status: 409 }
     );
 
-  // ponytail: passenger age/passport rules are enforced client-side only; a real API re-validates.
+  // Note: passenger age/passport rules are enforced client-side only; a real API re-validates.
   const ref = createBookingRef();
   bookingsByRequest.set(requestId, ref);
   return Response.json({ ref }, { status: 201 });

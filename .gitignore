@@ -40,7 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# plan workspace
-.superpowers
 test-results
 playwright-report
