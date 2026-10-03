@@ -2,7 +2,7 @@
 
 A search → book flight flow built to show how I approach complex booking UIs: URL-driven search state, server-rendered results with client-side caching, typed multi-passenger forms, and a fare re-check before confirming.
 
-**Live demo:** https://flight-booking-demo.vercel.app · **All data is fictional** (real airport codes, made-up airlines, no real bookings).
+**Live demo:** https://flight-booking-demo-seven.vercel.app · **All data is fictional** (real airport codes, made-up airlines, no real bookings).
 
 | Search                         | Results                         | Passengers                         | Confirmation                         |
 | ------------------------------ | ------------------------------- | ---------------------------------- | ------------------------------------ |
