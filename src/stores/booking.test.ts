@@ -74,7 +74,13 @@ describe('booking store', () => {
 });
 
 describe('bookingGuard', () => {
-  const base = { search: null, outbound: null, inbound: null, details: null };
+  const base = {
+    search: null,
+    outbound: null,
+    inbound: null,
+    details: null,
+    lastBooking: null,
+  };
 
   it('sends empty sessions back to search', () => {
     expect(bookingGuard(base, 'passengers')).toBe('/');
@@ -91,5 +97,19 @@ describe('bookingGuard', () => {
     expect(bookingGuard(ready, 'passengers')).toBeNull();
     expect(bookingGuard(ready, 'review')).toBe('/book/passengers');
     expect(bookingGuard({ ...ready, details }, 'review')).toBeNull();
+  });
+
+  it('sends a just-completed booking to its confirmation, not back to search', () => {
+    const lastBooking = {
+      ref: 'K7Q2XD',
+      search,
+      legs: [],
+      passengers: details.passengers,
+      contact: details.contact,
+      total: 1,
+    };
+    expect(bookingGuard({ ...base, lastBooking }, 'review')).toBe(
+      '/book/confirmation/K7Q2XD'
+    );
   });
 });

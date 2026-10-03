@@ -76,10 +76,16 @@ export const useBookingStore = create<BookingState & Actions>()(
 );
 
 export function bookingGuard(
-  state: Pick<BookingState, 'search' | 'outbound' | 'inbound' | 'details'>,
+  state: Pick<
+    BookingState,
+    'search' | 'outbound' | 'inbound' | 'details' | 'lastBooking'
+  >,
   step: 'passengers' | 'review'
 ): string | null {
-  if (!state.search || !state.outbound) return '/';
+  if (!state.search || !state.outbound)
+    return state.lastBooking
+      ? `/book/confirmation/${state.lastBooking.ref}`
+      : '/';
   if (state.search.trip === 'return' && !state.inbound)
     return `/flights?${toSearchParams(state.search)}`;
   if (step === 'review' && !state.details) return '/book/passengers';
