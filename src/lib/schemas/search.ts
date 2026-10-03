@@ -14,23 +14,32 @@ const iata = z
   .string()
   .toUpperCase()
   .refine((c) => airportByCode.has(c), 'Choose an airport from the list');
-const count = (min: number, max: number) =>
-  z.coerce.number().int().min(min).max(max);
+// One readable message per field, whatever a hand-edited URL contains.
+const count = (min: number, max: number, message: string) =>
+  z.coerce
+    .number({ message })
+    .int({ message })
+    .min(min, { message })
+    .max(max, { message });
 
 export const searchSchema = z
   .object({
     from: iata,
     to: iata,
-    trip: z.enum(['oneway', 'return']),
+    trip: z.enum(['oneway', 'return'], { message: 'Choose one-way or return' }),
     depart: isoDate,
     return: z.preprocess(
       (v) => (v === '' || v === null ? undefined : v),
       isoDate.optional()
     ),
-    adults: count(1, 9),
-    children: count(0, 8).default(0),
-    infants: count(0, 9).default(0),
-    cabin: z.enum(['economy', 'premium', 'business']).default('economy'),
+    adults: count(1, 9, 'Choose 1–9 adults'),
+    children: count(0, 8, 'Choose 0–8 children').default(0),
+    infants: count(0, 9, 'Choose 0–9 infants').default(0),
+    cabin: z
+      .enum(['economy', 'premium', 'business'], {
+        message: 'Choose a cabin class',
+      })
+      .default('economy'),
   })
   .superRefine((s, ctx) => {
     const issue = (path: string, message: string) =>

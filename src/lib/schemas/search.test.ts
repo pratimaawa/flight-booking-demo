@@ -97,3 +97,18 @@ describe('impossible dates', () => {
     expect(r.success).toBe(false);
   });
 });
+
+describe('friendly messages for hand-edited URLs', () => {
+  it.each([
+    [{ adults: 'abc' }, 'adults', 'Choose 1–9 adults'],
+    [{ adults: '1.5' }, 'adults', 'Choose 1–9 adults'],
+    [{ children: 'x' }, 'children', 'Choose 0–8 children'],
+    [{ trip: undefined }, 'trip', 'Choose one-way or return'],
+    [{ cabin: 'first' }, 'cabin', 'Choose a cabin class'],
+  ])('%o', (patch, path, message) => {
+    expect(messages(parseSearch({ ...valid, ...patch }))).toContainEqual([
+      path,
+      message,
+    ]);
+  });
+});

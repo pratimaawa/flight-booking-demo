@@ -13,6 +13,18 @@ import { parseSearch } from '@/lib/schemas/search';
 
 export const metadata: Metadata = { title: 'Flights' };
 
+const FIELD_LABEL: Record<string, string> = {
+  from: 'From',
+  to: 'To',
+  trip: 'Trip type',
+  depart: 'Departure date',
+  return: 'Return date',
+  adults: 'Adults',
+  children: 'Children',
+  infants: 'Infants',
+  cabin: 'Cabin',
+};
+
 export default async function FlightsPage({
   searchParams,
 }: PageProps<'/flights'>) {
@@ -23,7 +35,12 @@ export default async function FlightsPage({
         <h1 className="text-xl font-semibold">This search isn&apos;t valid</h1>
         <ul className="mt-2 list-disc pl-5 text-sm text-muted">
           {parsed.error.issues.map((i, n) => (
-            <li key={n}>{i.message}</li>
+            <li key={n}>
+              <span className="font-medium text-fg">
+                {FIELD_LABEL[String(i.path[0])] ?? 'Search'}:
+              </span>{' '}
+              {i.message}
+            </li>
           ))}
         </ul>
         <Link href="/" className="mt-4 btn-primary">
