@@ -84,7 +84,7 @@ export function FiltersPanel({
             className="w-full accent-brand"
             min={lo}
             max={hi}
-            step={10}
+            step={1}
             value={max}
             onChange={(e) => {
               const v = Number(e.target.value);
