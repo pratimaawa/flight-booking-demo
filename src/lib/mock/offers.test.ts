@@ -87,3 +87,12 @@ describe('currentFarePrice', () => {
     expect(currentFarePrice('garbage', 'saver', null)).toBeNull();
   });
 });
+
+describe('parseOfferId dates', () => {
+  it('rejects ids with impossible dates instead of crashing later', () => {
+    expect(parseOfferId('KTM.DXB.2026-13-01.economy.0')).toBeNull();
+    expect(
+      currentFarePrice('KTM.DXB.2026-13-01.economy.0', 'saver', null)
+    ).toBeNull();
+  });
+});

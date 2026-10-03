@@ -90,3 +90,10 @@ describe('search schema', () => {
     );
   });
 });
+
+describe('impossible dates', () => {
+  it.each(['2026-13-01', '2026-02-30', '2026-00-10'])('rejects %s', (d) => {
+    const r = parseSearch({ ...valid, depart: d, trip: 'oneway', return: '' });
+    expect(r.success).toBe(false);
+  });
+});

@@ -1,3 +1,4 @@
+import { isoDate } from '../schemas/search';
 import type { Cabin, Fare, FareId, Offer, Segment } from '../types';
 import { AIRLINES } from './airlines';
 import { airportByCode, distanceKm, HUBS } from './airports';
@@ -60,7 +61,8 @@ export function parseOfferId(
     extra !== undefined
   )
     return null;
-  if (!(cabin in CABIN_MULTIPLIER)) return null;
+  if (!(cabin in CABIN_MULTIPLIER) || !isoDate.safeParse(date).success)
+    return null;
   const n = Number(index);
   if (!Number.isInteger(n) || n < 0) return null;
   return { query: { from, to, date, cabin: cabin as Cabin }, index: n };
