@@ -2,7 +2,7 @@ import type { Airline } from '../types';
 
 // All fictional.
 export const AIRLINES: Airline[] = [
-  { code: 'H7', name: 'Himal Air' },
+  { code: 'H7', name: 'Peakline Air' },
   { code: 'S3', name: 'Saffron Airways' },
   { code: 'D6', name: 'Desert Falcon' },
   { code: 'M2', name: 'Monsoon Air' },
