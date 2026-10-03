@@ -27,7 +27,8 @@ export function ReviewBooking({
 }) {
   const router = useRouter();
   const complete = useBookingStore((s) => s.complete);
-  const { legs, missing } = useTripLegs(search, choices);
+  const trip = useTripLegs(search, choices);
+  const { legs, missing } = trip;
   const pax = paxCounts(search);
 
   // Re-check every leg's price right before booking, like a real booking engine.
@@ -118,6 +119,20 @@ export function ReviewBooking({
         </section>
 
         <div aria-live="polite" className="space-y-3">
+          {trip.isError && (
+            <div role="alert" className="card">
+              <p className="font-medium">
+                We couldn&apos;t load your flight details.
+              </p>
+              <button
+                type="button"
+                className="mt-3 btn-secondary"
+                onClick={trip.refetch}
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {priceQueries.some((q) => q.isError) && (
             <div role="alert" className="card">
               <p className="font-medium">
@@ -167,12 +182,13 @@ export function ReviewBooking({
           <button
             type="button"
             className="btn-primary"
-            disabled={!current || needsAccept || book.isPending}
+            // Both the quoted and the current fare must be known before booking.
+            disabled={!current || !legs || needsAccept || book.isPending}
             onClick={() => book.mutate()}
           >
             {book.isPending
               ? 'Confirming…'
-              : current
+              : current && legs
                 ? 'Confirm booking'
                 : 'Checking fare…'}
           </button>
